@@ -18,7 +18,7 @@ class CreateRelationsTable extends Migration
             $table->string('name');
             $table->string('dob');
             $table->integer('age');
-            $table->enum('gender');
+            $table->enum('gender', ['male', 'female']);
             $table->integer('blood_group');
             $table->string('address');
             $table->string('contact');

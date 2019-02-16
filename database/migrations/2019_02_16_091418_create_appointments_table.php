@@ -19,13 +19,13 @@ class CreateAppointmentsTable extends Migration
             $table->integer('age');
             $table->string('blood_group');
             $table->string('dob');
-            $table->enum('gender');
+            $table->enum('gender', ['male', 'female']);
             $table->string('location');
             $table->string('contact');
             $table->string('emergency_contact');
             $table->date('appointment_date');
             $table->time('appointment_time');
-            $table->enum('status');
+            $table->enum('status', ['completed','in-process']);
             $table->string('note');
 
             $table->integer('hospital_id')->unsigned();

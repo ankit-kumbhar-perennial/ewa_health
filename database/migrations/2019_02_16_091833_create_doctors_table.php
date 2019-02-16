@@ -28,7 +28,7 @@ class CreateDoctorsTable extends Migration
             $table->integer('appointment_id')->unsigned();
             $table->foreign('appointment_id')->references('id')->on('appointments');
 
-            $table->enum('gender');
+            $table->enum('gender', ['male', 'female']);
             $table->timestamps();
         });
     }
