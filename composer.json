@@ -12,7 +12,10 @@
         "asahasrabuddhe/laravel-api": "^0.3.2@beta",
         "fideloper/proxy": "^4.0",
         "laravel/framework": "5.7.*",
-        "laravel/tinker": "^1.0"
+        "laravel/tinker": "^1.0",
+        "laravel/passport": "^4.0",
+        "benbjurstrom/passport-custom-jwt-claims": "^0.0.4",
+        "pimplesushant/passport-token-custom-claims": "^0.0.1"
     },
     "require-dev": {
         "beyondcode/laravel-dump-server": "^1.0",

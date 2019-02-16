@@ -15,9 +15,9 @@ class CreateFacilitiesTable extends Migration
     {
         Schema::create('facilities', function (Blueprint $table) {
             $table->increments('id');
-            $table->increments('name');
+            $table->string('name');
             $table->integer('hospital_id')->unsigned();
-            $table->foreign('hospital_id')->references('id')->on('hospitals');
+            // $table->foreign('hospital_id')->references('id')->on('hospitals');
 
             $table->timestamps();
         });
