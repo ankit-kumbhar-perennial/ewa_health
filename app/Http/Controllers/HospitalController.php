@@ -22,4 +22,18 @@ class HospitalController extends Controller
         }
     }
 
+
+
+    public function listfacilities($id)
+    {
+        try {
+            $facility = Hospital::findOrFail($id);
+//            echo "<pre>"; print_r($facility); die;
+        return response()->json($facility);
+    } catch (\Exception $ex) {
+
+        return array('success' => false, 'message' => "hospital not found");
+
+    }
+    }
 }

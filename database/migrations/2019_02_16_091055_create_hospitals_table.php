@@ -20,9 +20,15 @@ class CreateHospitalsTable extends Migration
             $table->string('logo')->nullable();
             $table->string('ratings');
             $table->integer('facility_id')->unsigned();
+
              $table->foreign('facility_id')->references('id')->on('facilities');
             $table->integer('doctor_id')->unsigned();
              $table->foreign('doctor_id')->references('id')->on('doctors');
+
+             $table->foreign('facility_id')->references('id')->on('facilities')->onDelete('cascade');
+            $table->integer('doctor_id')->unsigned();
+             $table->foreign('doctor_id')->references('id')->on('doctors')->onDelete('cascade');
+
             $table->timestamps();
         });
     }
