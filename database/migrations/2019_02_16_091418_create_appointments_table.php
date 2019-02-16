@@ -29,16 +29,16 @@ class CreateAppointmentsTable extends Migration
             $table->string('note');
 
             $table->integer('hospital_id')->unsigned();
-            $table->foreign('hospital_id')->references('id')->on('hospitals');
+            $table->foreign('hospital_id')->references('id')->on('hospitals')->onDelete('cascade');
 
             $table->integer('doctor_id')->unsigned();
-            $table->foreign('doctor_id')->references('id')->on('doctors');
+            $table->foreign('doctor_id')->references('id')->on('doctors')->onDelete('cascade');
 
             $table->integer('facility_id')->unsigned();
-            $table->foreign('facility_id')->references('id')->on('facilities');
+            $table->foreign('facility_id')->references('id')->on('facilities')->onDelete('cascade');
 
-            $table->integer('relation__id')->unsigned();
-            $table->foreign('relation_id')->references('id')->on('relations');
+            $table->integer('relation_id')->unsigned();
+            $table->foreign('relation_id')->references('id')->on('relations')->onDelete('cascade');
             $table->timestamps();
         });
     }
