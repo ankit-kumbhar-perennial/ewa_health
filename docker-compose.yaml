@@ -1,0 +1,37 @@
+version: '2'
+
+volumes:
+ easy-health-app-db-vol:
+
+services:
+  mysql:
+    image: mysql:5.7
+    volumes:
+      - easy-health-app-db-vol:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: easyHealth
+      MYSQL_DATABASE: easyHealth
+    ports:
+      - 3308:3306
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: easyHealth
+    ports:
+      - 8070:80
+    depends_on:
+      - mysql
+  www:
+    image: ajitemsahasrabuddhe/php-apache:bionic-7.2-dev
+    ports:
+      - 81:80
+    volumes:
+      - ./:/var/www/html
+      - ./000-default.conf:/etc/apache2/sites-available/000-default.conf
+    environment:
+      XDEBUG_CONFIG: remote_host=172.17.0.1
+    restart: always
+    depends_on:
+      - mysql
