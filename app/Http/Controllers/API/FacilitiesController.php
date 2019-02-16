@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Facilities;
+use App\Facility;
 use Asahasrabuddhe\LaravelAPI\BaseController;
 
 //use App\Facilities;
@@ -21,7 +21,7 @@ class FacilitiesController extends BaseController
      *
      * @var string
      */
-     protected $model = Facilities::class;
+     protected $model = Facility::class;
 
     /*
      * Fully qualified name of the Request class that will be used to validate the index request.
@@ -100,9 +100,14 @@ class FacilitiesController extends BaseController
     //     return $query;
     // }
 
-//
+//    public function getFacilities()
+//    {
+//        $facilities = Facilities::all();
+//        return response()->json($facilities);
+//    }
 
-    public function show(...$args) {
-        echo '<pre>'; print_r("Welcome"); die;
-    }
+//    public function index() {
+////        echo '<pre>'; print_r("Welcome"); die;
+//        return parent::index();
+//    }
 }
