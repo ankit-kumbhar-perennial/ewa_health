@@ -98,6 +98,7 @@ class FacilitiesController extends BaseController
     // protected function modifyDelete($query)
     // {
     //     return $query;
+//    return
     // }
 
 //    public function getFacilities()

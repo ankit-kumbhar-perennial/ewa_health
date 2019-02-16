@@ -22,6 +22,10 @@ Route::apiResource('users', 'API\UserController');
 
 Route::apiResource('facilities', 'API\FacilitiesController');
 
+Route::apiResource('appointments', 'API\AppointmentController');
+
+Route::apiResource('history', 'API\AppointmentController');
+
 Route::group(['prefix' => 'user'], function () {
     Route::post('signin', 'PassportController@login');
     Route::post('signup', 'PassportController@signup');

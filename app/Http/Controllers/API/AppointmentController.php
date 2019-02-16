@@ -24,7 +24,7 @@ class AppointmentController extends BaseController
      *
      * @var string
      */
-    use ResponseTrait;
+     use ResponseTrait;
      protected $model = Appointment::class;
 
     /*
