@@ -23,10 +23,10 @@ class CreateDoctorsTable extends Migration
             $table->string('comments')->nullable();
 
             $table->integer('hospital_id')->unsigned();
-            $table->foreign('hospital_id')->references('id')->on('hospitals');
+            $table->foreign('hospital_id')->references('id')->on('hospitals')->onDelete('cascade');
 
             $table->integer('appointment_id')->unsigned();
-            $table->foreign('appointment_id')->references('id')->on('appointments');
+            $table->foreign('appointment_id')->references('id')->on('appointments')->onDelete('cascade');
 
             $table->enum('gender', ['male', 'female']);
             $table->timestamps();
