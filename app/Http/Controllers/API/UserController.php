@@ -5,6 +5,9 @@ namespace App\Http\Controllers\API;
 use Asahasrabuddhe\LaravelAPI\BaseController;
 
 use App\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use \App\Services\RegistrationService;
 // use App\Http\Requests\UserIndexRequest;
 // use App\Http\Requests\UserStoreRequest;
 // use App\Http\Requests\UserShowRequest;
@@ -23,6 +26,13 @@ class UserController extends BaseController
     use \App\Traits\ResponseTrait;
 
     protected $model = User::class;
+
+    private $registrationService;
+
+    public function __construct(RegistrationService $registrationService) {
+        parent::__construct();
+        $this->registrationService = $registrationService;
+    }
 
     /*
      * Fully qualified name of the Request class that will be used to validate the index request.
@@ -135,5 +145,147 @@ class UserController extends BaseController
             \DB::rollBack();
             return $this->respondWithError("Registration failed", 500);
         }
+
     }
+
+    /**
+     * Used to fotgotpassword
+     * 
+     * @param Request $request
+     * @return object
+     */
+    public function forgetPassword(Request $request) {
+    
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->respondWithError($validator->errors(), 422);
+        }
+            
+        $email = $request->get('email');
+        $otpDetails = $this->getOTP($email);     
+        $otp = $otpDetails['otp'];
+        
+        if(date('Y-m-d H:i:s') > $otpDetails['otp_expired_at']) {
+            $otp = $this->generateNumber(5);
+        }
+        
+        $this->registrationService->sendForgotPasswordOtp($otp, $email);
+        
+        $currentDate = strtotime(date('Y-m-d H:i:s'));
+        $otpExpiryDuration = \Config::get('constants.OTP_EXPIRY_DURATION');
+        $otpExpiredTime = date("Y-m-d H:i:s", $currentDate +( 60 * $otpExpiryDuration ));
+            
+        User::where('email', $email)->update(array('otp' => $otp, 'otp_expired_at' => $otpExpiredTime));
+        
+        $data['otp'] = $otp;
+        return $this->respondWithSuccess($data, null, 200);
+    }
+
+    /**
+     * Used to get otp details from email
+     * 
+     * @param type $email
+     * @return array
+     */
+    public function getOTP($email) {
+        
+        return User::select('contact_no', 'otp', 'otp_expired_at')->where('email', $email)->first();
+        
+    }
+
+    /**
+     * Used to generate otp
+     * 
+     * @param Request $request
+     * @return object
+     */
+    public function generateToken($length) {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[random_int(0, $charactersLength - 1)];
+        }
+        return $randomString;
+    }
+
+    /**
+     * Used to generate otp
+     * 
+     * @param type $email
+     * @return array
+     */
+    public function generateNumber($digits) {
+        return random_int(pow(10, $digits-1), pow(10, $digits)-1);
+    }
+
+    /**
+     * Used to verify OTP
+     * 
+     * @param Request $request
+     * @return object
+     */
+    public function verifyOTP(Request $request) {
+        try {
+            
+            $validator = Validator::make($request->all(), [
+                'email' => 'required|email|exists:users',
+                'otp' => 'required',
+            ]);
+            
+            if ($validator->fails()) {
+                return $this->respondWithError($validator->errors(), 422);
+            }
+            
+            $email = $request->get('email');
+            $otp = $request->get('otp');
+
+            $otpDetails = $this->getOTP($email);
+
+            if(date('Y-m-d H:i:s') > $otpDetails['otp_expired_at']) {
+                return $this->respondWithError('OTP Expired', 400);
+            }
+            
+            if($otp == $otpDetails['otp']) {
+
+                $updateData = array('otp_expired_at' => date('Y-m-d H-:i:s'));
+
+                User::where('email', $email)->update($updateData);
+                return $this->respondWithSuccess(null, null, 200);
+            }
+            
+            return $this->respondWithError('Incorrect OTP', 400);
+            
+        } catch (\Exception $ex) {
+            
+        }
+    }
+
+    /**
+     * Used to reset password
+     * 
+     * @param type $email
+     * @return array
+     */
+    public function resetPassword(Request $request) {
+        
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users',
+            'password' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->respondWithError($validator->errors(), 422);
+        }
+        
+        $password = $request->get('password');
+        
+        \DB::table('users')->update(array('password' => bcrypt($password)));
+                
+        return $this->respondWithSuccess(null, null, 200);
+    }
+
 }

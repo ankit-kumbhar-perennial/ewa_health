@@ -42,7 +42,7 @@ return [
         ],
 
         'api' => [
-            'driver' => 'firebase',
+            'driver' => 'passport',
             'provider' => 'users',
         ],
     ],

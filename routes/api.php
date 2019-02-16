@@ -19,6 +19,9 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::post('users', 'API\UserController@store');
 Route::apiResource('users', 'API\UserController');
+Route::post('user/forgetPassword', 'API\UserController@forgetPassword');
+Route::post('user/verifyOTP', "API\UserController@verifyOTP");
+Route::post('user/resetPassword', 'API\UserController@resetPassword');
 
 Route::apiResource('facilities', 'API\FacilitiesController');
 
