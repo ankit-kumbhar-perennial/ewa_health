@@ -100,11 +100,7 @@ class FacilitiesController extends BaseController
     //     return $query;
     // }
 
-//    public function getFacilities()
-//    {
-//        $facilities = Facilities::all();
-//        return $facilities;
-//    }
+//
 
     public function show(...$args) {
         echo '<pre>'; print_r("Welcome"); die;

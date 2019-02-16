@@ -17,7 +17,7 @@ class CreateFacilitiesTable extends Migration
             $table->increments('id');
             $table->string('name');
             $table->integer('hospital_id')->unsigned();
-             $table->foreign('hospital_id')->references('id')->on('hospitals')->onDelete('cascade');
+            //$table->foreign('hospital_id')->references('id')->on('hospitals')->onDelete('cascade');
 
             $table->timestamps();
         });

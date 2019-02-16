@@ -19,6 +19,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::post('users', 'API\UserController@store');
 
+Route::apiResource('facilities', 'API\FacilitiesController');
+
 Route::group(['prefix' => 'user'], function () {
     Route::post('signin', 'PassportController@login');
     Route::post('signup', 'PassportController@signup');
