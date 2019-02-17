@@ -21,7 +21,6 @@ class AddDropColumns extends Migration
             $table->dropColumn('blood_group');
             $table->dropColumn('dob');
             $table->dropColumn('emergency_contact');
-
         });
     }
 

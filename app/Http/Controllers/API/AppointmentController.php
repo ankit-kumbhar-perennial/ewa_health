@@ -135,9 +135,12 @@ class AppointmentController extends BaseController
 
             $result = parent::store();
 
+            $response = json_decode($result->getContent(), true);
+
             if ($result->getStatusCode() == 201) {
                 DB::commit();
-                return $this->respondWithSuccess(null, "Appointment booked successful", $result->getStatusCode());
+                $data['key'] = request()->request->get('key');
+                return $this->respondWithSuccess($data, "Appointment booked successful", $result->getStatusCode());
             }
             DB::rollBack();
             return $this->respondWithError("Appointment store failed", 500);

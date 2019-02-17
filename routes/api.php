@@ -29,6 +29,9 @@ Route::apiResource('appointments', 'API\AppointmentController');
 
 Route::apiResource('history', 'API\AppointmentController');
 
+Route::apiResource('update_status', 'API\StatusController');
+
+
 Route::group(['prefix' => 'user'], function () {
     Route::post('signin', 'PassportController@login');
     Route::post('signup', 'PassportController@signup');

@@ -9,7 +9,6 @@ use App\Hospital;
 class HospitalController extends Controller
 {
 
-
     public function Display()
     {
         try {
@@ -22,8 +21,6 @@ class HospitalController extends Controller
         }
     }
 
-
-
     public function listfacilities($id)
     {
         try {
@@ -33,7 +30,6 @@ class HospitalController extends Controller
     } catch (\Exception $ex) {
 
         return array('success' => false, 'message' => "hospital not found");
-
     }
     }
 }
