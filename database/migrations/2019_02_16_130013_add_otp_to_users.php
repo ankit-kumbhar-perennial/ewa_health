@@ -15,8 +15,8 @@ class AddOtpToUsers extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
 
-            $table->string('otp')->after('password');
-            $table->string('otp_expired_at')->after('remember_token');
+            $table->string('otp')->after('password')->nullable();
+            $table->string('otp_expired_at')->after('remember_token')->nullable();
         });
 
     }

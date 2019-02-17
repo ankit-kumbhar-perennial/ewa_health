@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Appointment;
 use App\Traits\ResponseTrait;
 use Asahasrabuddhe\LaravelAPI\BaseController;
+use App\Http\Controllers\API\UserController;
 
 // use App\Http\Requests\AppointmentIndexRequest;
 // use App\Http\Requests\AppointmentStoreRequest;
@@ -121,7 +122,6 @@ class AppointmentController extends BaseController
                 'facility_id' => 'required',
                 'relation_id' => 'required',
                 'hospital_id' => 'required',
-                'doctor_id' => 'required',
                 'payment_mode' => 'required'
             );
 
@@ -132,6 +132,12 @@ class AppointmentController extends BaseController
             }
 
             request()->request->add(['key' => random_int(1000000000,9999999999)]);
+
+            if(request()->request->get('hospital_id') != '') {
+                $doctor_id = $this->getDoctorByHospital(request()->request->get('hospital_id'), request()->request->get('gender'));
+
+                request()->request->add(['doctor_id' => $doctor_id]);
+            }
 
             $result = parent::store();
 
@@ -149,5 +155,71 @@ class AppointmentController extends BaseController
             \Illuminate\Support\Facades\Log::info($ex->getMessage() . ' == ' . $ex->getLine());
             return $this->respondWithError("Appointment booking failed", 500);
         }
+    }
+
+    /*
+     * Modify the response of index
+     */
+    public function index()
+    {        
+        $result = parent::index();
+        $response = json_decode($result->getContent());
+        
+        if($result->getStatusCode() == 200) {
+
+            if(isset($response->data[0]->doctor_id)) {
+                
+                $doctor_details = app('App\Http\Controllers\API\UserController')->getDoctor($response->data[0]->doctor_id);
+                $response->data['doctor_details'] = $doctor_details;
+            }
+
+            if(isset($response->data[0]->facility_id)) {
+                
+                $facility_details = app('App\Http\Controllers\API\UserController')->getFacility($response->data[0]->facility_id);
+                $response->data['facility_details'] = $facility_details;
+            }
+
+            if(isset($response->data[0]->hospital_id)) {
+                
+                $hospital_details = app('App\Http\Controllers\API\UserController')->getHospital($response->data[0]->hospital_id);
+                $response->data['hospital_details'] = $hospital_details;
+            }
+
+            if(isset($response->data[0]->relation_id)) {
+                
+                $relation_details = app('App\Http\Controllers\API\UserController')->getRelation($response->data[0]->relation_id);
+                $response->data['relation_details'] = $relation_details;
+            }
+
+            return $this->responseWithSuccessAndPagination($response, null, $result->getStatusCode(), 'appointments');
+        }
+        return $this->respondWithError(json_decode($response->getContent()), $result->getStatusCode());
+    }
+
+    /*
+     * Modify the response for show
+     */
+    public function show(...$args)
+    {
+        $result = parent::show(...$args);
+        $response = json_decode($result->getContent());
+        if($result->getStatusCode() == 200) {
+            $data = [
+                'appointment' => $response->data
+            ];
+            return $this->respondWithSuccess($data, null, $result->getStatusCode());
+        }
+        return $this->respondWithError(json_decode($response->getContent()), $result->getStatusCode());
+    }
+
+    /*
+     * Get doctor by hospital id
+     */
+    public function getDoctorByHospital($hospital_id, $gender) {
+        $doctors = \DB::table('doctors')
+            ->where(['hospital_id' => $hospital_id, 'gender' => $gender])
+            ->get();
+
+        return $doctors->pluck('id')->shuffle()->first();
     }
 }

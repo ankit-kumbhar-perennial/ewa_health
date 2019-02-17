@@ -21,7 +21,7 @@ class CreateUsersTable extends Migration
             $table->string('age');
             $table->enum('gender',['male','female']);
             $table->string('address')->nullable();
-            $table->string('blood_group');
+            $table->string('blood_group')->nullable();
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();

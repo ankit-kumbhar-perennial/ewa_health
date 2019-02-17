@@ -8,6 +8,7 @@ use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use \App\Services\RegistrationService;
+use Illuminate\Support\Facades\Log;
 // use App\Http\Requests\UserIndexRequest;
 // use App\Http\Requests\UserStoreRequest;
 // use App\Http\Requests\UserShowRequest;
@@ -122,7 +123,6 @@ class UserController extends BaseController
                 'age' => 'required|string',
                 'gender' => 'required',
                 'address' => 'required',
-                'blood_group' => 'required',
                 'password' => 'required|string',
             ]);
 
@@ -131,6 +131,8 @@ class UserController extends BaseController
             }
 
             request()->request->add(['password'=>bcrypt(request()->request->get('password'))]);
+            request()->request->add(['otp'=>0]);
+            request()->request->add(['otp_expired_at'=>date('Y-m-d H:i:s')]);
 
             $result = parent::store();
 
@@ -142,6 +144,7 @@ class UserController extends BaseController
             }
         }
         catch(\Exception $e) {
+            Log::error($e->getMessage().' on line no = '. $e->getLine().' file = '.$e->getFile());
             \DB::rollBack();
             return $this->respondWithError("Registration failed", 500);
         }
@@ -288,4 +291,19 @@ class UserController extends BaseController
         return $this->respondWithSuccess(null, null, 200);
     }
 
+    public function getDoctor($id) {
+        return \DB::table('doctors')->where(['id' => $id])->first();
+    }
+
+    public function getFacility($id) {
+        return \DB::table('facilities')->where(['id' => $id])->first();
+    }
+
+    public function getHospital($id) {
+        return \DB::table('hospitals')->where(['id' => $id])->first();
+    }
+
+    public function getRelation($id) {
+        return \DB::table('relations')->where(['id' => $id])->first();
+    }
 }

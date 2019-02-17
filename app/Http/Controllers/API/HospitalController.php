@@ -2,19 +2,18 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Facility;
 use Asahasrabuddhe\LaravelAPI\BaseController;
 
-//use App\Facilities;
-// use App\Http\Requests\FacilitiesIndexRequest;
-// use App\Http\Requests\FacilitiesStoreRequest;
-// use App\Http\Requests\FacilitiesShowRequest;
-// use App\Http\Requests\FacilitiesUpdateRequest;
-// use App\Http\Requests\FacilitiesDeleteRequest;
+use App\Hospital;
+// use App\Http\Requests\HospitalIndexRequest;
+// use App\Http\Requests\HospitalStoreRequest;
+// use App\Http\Requests\HospitalShowRequest;
+// use App\Http\Requests\HospitalUpdateRequest;
+// use App\Http\Requests\HospitalDeleteRequest;
 /**
- * Class Facilities.
+ * Class Hospital.
  */
-class FacilitiesController extends BaseController
+class HospitalController extends BaseController
 {
     /*
      * Fully qualified name of the Model class that this controller represents.
@@ -24,42 +23,42 @@ class FacilitiesController extends BaseController
     
     use \App\Traits\ResponseTrait;
 
-     protected $model = Facility::class;
+    protected $model = Hospital::class;
 
     /*
      * Fully qualified name of the Request class that will be used to validate the index request.
      *
      * @var string
      */
-    // protected $indexRequest = FacilitiesIndexRequest::class;
+    // protected $indexRequest = HospitalIndexRequest::class;
 
     /*
      * Fully qualified name of the Request class that will be used to validate the store request.
      *
      * @var string
      */
-    // protected $storeRequest = FacilitiesStoreRequest::class;
+    // protected $storeRequest = HospitalStoreRequest::class;
 
     /*
      * Fully qualified name of the Request class that will be used to validate the show request.
      *
      * @var string
      */
-    // protected $showRequest = FacilitiesShowRequest::class;
+    // protected $showRequest = HospitalShowRequest::class;
 
     /*
      * Fully qualified name of the Request class that will be used to validate the update request.
      *
      * @var string
      */
-    // protected $updateRequest = FacilitiesUpdateRequest::class;
+    // protected $updateRequest = HospitalUpdateRequest::class;
 
     /*
      * Fully qualified name of the Request class that will be used to validate the delete request.
      *
      * @var string
      */
-    // protected $deleteRequest = FacilitiesDeleteRequest::class;
+    // protected $deleteRequest = HospitalDeleteRequest::class;
 
     /*
      * Modify the query for index request.
@@ -103,17 +102,6 @@ class FacilitiesController extends BaseController
     //     return $query;
     // }
 
-//    public function getFacilities()
-//    {
-//        $facilities = Facilities::all();
-//        return response()->json($facilities);
-//    }
-
-//    public function index() {
-////        echo '<pre>'; print_r("Welcome"); die;
-//        return parent::index();
-//    }
-
     /*
      * Modify the response of index
      */
@@ -123,7 +111,7 @@ class FacilitiesController extends BaseController
         $response = json_decode($result->getContent());
         
         if($result->getStatusCode() == 200) {
-            return $this->responseWithSuccessAndPagination($response, null, $result->getStatusCode(), 'facilities');
+            return $this->responseWithSuccessAndPagination($response, null, $result->getStatusCode(), 'hospitals');
         }
         return $this->respondWithError(json_decode($response->getContent()), $result->getStatusCode());
      }
@@ -137,7 +125,7 @@ class FacilitiesController extends BaseController
         $response = json_decode($result->getContent());
         if($result->getStatusCode() == 200) {
             $data = [
-                'facility' => $response->data
+                'hospital' => $response->data
             ];
             return $this->respondWithSuccess($data, null, $result->getStatusCode());
         }
