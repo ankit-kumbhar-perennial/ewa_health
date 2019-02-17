@@ -33,6 +33,7 @@ Route::apiResource('history', 'API\AppointmentController');
 
 Route::apiResource('update_status', 'API\StatusController');
 
+Route::apiResource('doctors', 'API\DoctorController');
 
 Route::group(['prefix' => 'user'], function () {
     Route::post('signin', 'PassportController@login');

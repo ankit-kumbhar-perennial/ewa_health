@@ -117,10 +117,7 @@ class AppointmentController extends BaseController
                 'location' => 'required',
                 'contact' => 'required|numeric',
                 'appointment_date' => 'required',
-                'appointment_time' => 'required',
-                'note' => 'required',
                 'facility_id' => 'required',
-                'relation_id' => 'required',
                 'hospital_id' => 'required',
                 'payment_mode' => 'required'
             );
