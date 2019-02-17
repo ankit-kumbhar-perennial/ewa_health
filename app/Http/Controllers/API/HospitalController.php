@@ -106,7 +106,7 @@ class HospitalController extends BaseController
      * Modify the response of index
      */
      public function index()
-     {        
+     {
         $result = parent::index();
         $response = json_decode($result->getContent());
         
@@ -121,14 +121,25 @@ class HospitalController extends BaseController
      */
      public function show(...$args)
      {
-        $result = parent::show(...$args);
-        $response = json_decode($result->getContent());
-        if($result->getStatusCode() == 200) {
-            $data = [
-                'hospital' => $response->data
-            ];
-            return $this->respondWithSuccess($data, null, $result->getStatusCode());
+        try{
+            request()->request->add(['id' => $args[0]]);
+
+            $validator = \Illuminate\Support\Facades\Validator::make(request()->request->all(), [
+                'id' => 'required|string'
+            ]);
+
+            $result = parent::show(...$args);
+            $response = json_decode($result->getContent());
+            if($result->getStatusCode() == 200) {
+                $data = [
+                    'hospital' => $response->data
+                ];
+                return $this->respondWithSuccess($data, null, $result->getStatusCode());
+            }
+            return $this->respondWithError(json_decode($response->getContent()), $result->getStatusCode());
         }
-        return $this->respondWithError(json_decode($response->getContent()), $result->getStatusCode());
-     }
+        catch(\Exception $e) {
+            return $this->respondWithError($e->getMessage(), 400);
+        }
+    }
 }

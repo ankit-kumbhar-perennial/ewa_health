@@ -133,14 +133,19 @@ class FacilitiesController extends BaseController
      */
      public function show(...$args)
      {
-        $result = parent::show(...$args);
-        $response = json_decode($result->getContent());
-        if($result->getStatusCode() == 200) {
-            $data = [
-                'facility' => $response->data
-            ];
-            return $this->respondWithSuccess($data, null, $result->getStatusCode());
+        try{
+            $result = parent::show(...$args);
+            $response = json_decode($result->getContent());
+            if($result->getStatusCode() == 200) {
+                $data = [
+                    'facility' => $response->data
+                ];
+                return $this->respondWithSuccess($data, null, $result->getStatusCode());
+            }
+            return $this->respondWithError(json_decode($response->getContent()), $result->getStatusCode());
         }
-        return $this->respondWithError(json_decode($response->getContent()), $result->getStatusCode());
+        catch(\Exception $e) {
+            return $this->respondWithError($e->getMessage(), 400);
+        }
      }
 }

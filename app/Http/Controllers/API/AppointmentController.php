@@ -210,36 +210,41 @@ class AppointmentController extends BaseController
      */
     public function show(...$args)
     {
-        $result = parent::show(...$args);
-        $response = json_decode($result->getContent());
+        try {
+            $result = parent::show(...$args);
+            $response = json_decode($result->getContent());
 
-        if($result->getStatusCode() == 200) {
+            if($result->getStatusCode() == 200) {
 
-            if(isset($response->data->doctor_id)) {
+                if(isset($response->data->doctor_id)) {
 
-                $doctor_details = app('App\Http\Controllers\API\UserController')->getDoctor($response->data->doctor_id);
+                    $doctor_details = app('App\Http\Controllers\API\UserController')->getDoctor($response->data->doctor_id);
 
-                $response->data->doctor_details = $doctor_details;
+                    $response->data->doctor_details = $doctor_details;
+                }
+
+                if(isset($response->data->facility_id)) {
+                    
+                    $facility_details = app('App\Http\Controllers\API\UserController')->getFacility($response->data->facility_id);
+                    $response->data->facility_details = $facility_details;
+                }
+
+                if(isset($response->data->hospital_id)) {
+                    
+                    $hospital_details = app('App\Http\Controllers\API\UserController')->getHospital($response->data->hospital_id);
+                    $response->data->hospital_details = $hospital_details;
+                }
+
+                $data = [
+                    'appointment' => $response->data
+                ];
+                return $this->respondWithSuccess($data, null, $result->getStatusCode());
             }
-
-            if(isset($response->data->facility_id)) {
-                
-                $facility_details = app('App\Http\Controllers\API\UserController')->getFacility($response->data->facility_id);
-                $response->data->facility_details = $facility_details;
-            }
-
-            if(isset($response->data->hospital_id)) {
-                
-                $hospital_details = app('App\Http\Controllers\API\UserController')->getHospital($response->data->hospital_id);
-                $response->data->hospital_details = $hospital_details;
-            }
-
-            $data = [
-                'appointment' => $response->data
-            ];
-            return $this->respondWithSuccess($data, null, $result->getStatusCode());
+            return $this->respondWithError(json_decode($response->getContent()), $result->getStatusCode());
         }
-        return $this->respondWithError(json_decode($response->getContent()), $result->getStatusCode());
+        catch(\Exception $e) {
+            return $this->respondWithError($e->getMessage(), 400);
+        }
     }
 
     /*
