@@ -8,6 +8,7 @@ use App\User;
 use Illuminate\Support\Facades\Validator;
 use \App\Traits\ResponseTrait;
 use App\Helpers\HealthAPI;
+use Lcobucci\JWT\Parser;
 
 class PassportController extends \Laravel\Passport\Http\Controllers\AccessTokenController
 {
@@ -27,7 +28,7 @@ class PassportController extends \Laravel\Passport\Http\Controllers\AccessTokenC
      */
     public function login(Request $request)
     {
-        // echo '<pre>'; print_r($request->all()); die;
+
         if ($request->has('social_type') && $request->get('social_type') != 'normal') {
             $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
                 'email' => 'required|email|exists:users',
@@ -75,7 +76,7 @@ class PassportController extends \Laravel\Passport\Http\Controllers\AccessTokenC
             $user = $request->user();
             $password = $request->get('password');
         }
-        // echo '<pre>'; print_r(config('constants.PASSPORT_CLIENT_SECRET')); die;
+
         $data = [
             'grant_type' => 'password',
             'client_id' => 2,
@@ -86,9 +87,17 @@ class PassportController extends \Laravel\Passport\Http\Controllers\AccessTokenC
         $request = Request::create('/oauth/token', 'POST', $data);
 
         $token = app()->handle($request);
-// echo '<pre>'; print_r($token->getStatusCode()); die;
+
+        $user_details = json_decode($token->getContent(), true);
+
+        $user = array();
+
+        array_push($user, json_decode(Auth::user(), true));
+
+        $user_details['user_details'] = $user[0];
+
         if ($token->getStatusCode() == 200) {
-            return $this->respondWithSuccess(json_decode($token->getContent()), "Successfully logged in", $token->getStatusCode());
+            return $this->respondWithSuccess($user_details, "Successfully logged in", $token->getStatusCode());
         }
 
         return $this->respondWithError(json_decode($token->getContent()), $token->getStatusCode());
@@ -103,7 +112,16 @@ class PassportController extends \Laravel\Passport\Http\Controllers\AccessTokenC
     public function signout(Request $request)
     {
         try {
-            $request->user()->token()->revoke();
+
+            $value = $request->bearerToken();
+            $id = (new Parser())->parse($value)->getHeader('jti');
+        
+            \DB::table('oauth_access_tokens')
+                ->where('id', $id)
+                ->update([
+                    'revoked' => true
+            ]);
+
             return $this->respondWithSuccess(null, "Successfully signed out", 200);
         } catch (\Exception $ex) {
             return $this->respondWithError("Logout failed", 500);

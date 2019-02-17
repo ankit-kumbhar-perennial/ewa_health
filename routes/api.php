@@ -23,6 +23,8 @@ Route::post('user/forgetPassword', 'API\UserController@forgetPassword');
 Route::post('user/verifyOTP', "API\UserController@verifyOTP");
 Route::post('user/resetPassword', 'API\UserController@resetPassword');
 
+Route::apiResource('hospitals', 'API\HospitalController');
+
 Route::apiResource('facilities', 'API\FacilitiesController');
 
 Route::apiResource('appointments', 'API\AppointmentController');
@@ -33,7 +35,7 @@ Route::group(['prefix' => 'user'], function () {
     Route::post('signin', 'PassportController@login');
     Route::post('signup', 'PassportController@signup');
     Route::group(['middleware' => 'auth:api'], function() {
-        Route::get('signout', 'PassportController@signout');
+        Route::get('logout', 'PassportController@signout');
         Route::post('updateDeviceToken', 'PassportController@updateDeviceToken');
 //        Route::get('user', 'AuthController@user');
     });
