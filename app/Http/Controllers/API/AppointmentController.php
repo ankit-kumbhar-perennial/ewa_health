@@ -11,7 +11,8 @@ use App\Http\Controllers\API\UserController;
 // use App\Http\Requests\AppointmentStoreRequest;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-
+use Pimplesushant\Auth\PassportToken;
+use Illuminate\Support\Facades\Auth;
 // use App\Http\Requests\AppointmentShowRequest;
 // use App\Http\Requests\AppointmentUpdateRequest;
 // use App\Http\Requests\AppointmentDeleteRequest;
@@ -68,22 +69,22 @@ class AppointmentController extends BaseController
      * @param $query
      * @return mixed
      */
-    // protected function modifyIndex($query)
-    // {
-    //     Modifications like adding joins, inner queries etc can be done here.
-    //     return $query->where("status", "active");
-    //     return $query;
-    // }
+    protected function modifyIndex($query)
+    {
+        return $query->where("user_id", Auth::id());
+        return $query;
+    }
 
     /*
      * Modify the query for show request.
      * @param $query
      * @return mixed
      */
-    // protected function modifyShow($query)
-    // {
-    //     return $query;
-    // }
+    protected function modifyShow($query)
+    {
+        return $query->where("user_id", Auth::id());
+        return $query;
+    }
 
     /*
      * Modify the query for update request.
@@ -128,6 +129,14 @@ class AppointmentController extends BaseController
                 return $this->respondWithError($validator->errors(), 422);
             }
 
+            $token = request()->bearerToken();
+
+            if(!isset($token) && empty($token)) {
+                return $this->respondWithError('The user credentials were incorrect', 401);
+            }
+    
+            request()->request->add(['user_id' => Auth::id()]);
+
             request()->request->add(['key' => random_int(1000000000,9999999999)]);
 
             if(request()->request->get('hospital_id') != '') {
@@ -164,28 +173,31 @@ class AppointmentController extends BaseController
         
         if($result->getStatusCode() == 200) {
 
-            if(isset($response->data[0]->doctor_id)) {
+            $resp = json_decode($result->getContent(), true);
+            $i = 0;
+            foreach($resp as $results) {
+                foreach($results as $res) {
+                    // echo '<pre>'; print_r($res); die;
+                    if(isset($res['doctor_id'])) {
                 
-                $doctor_details = app('App\Http\Controllers\API\UserController')->getDoctor($response->data[0]->doctor_id);
-                $response->data['doctor_details'] = $doctor_details;
-            }
+                        $doctor_details = app('App\Http\Controllers\API\UserController')->getDoctor($res['doctor_id']);
+                        $res['doctor_details'] = $doctor_details;
+                    }
 
-            if(isset($response->data[0]->facility_id)) {
-                
-                $facility_details = app('App\Http\Controllers\API\UserController')->getFacility($response->data[0]->facility_id);
-                $response->data['facility_details'] = $facility_details;
-            }
+                    if(isset($res['facility_id'])) {
+                        
+                        $facility_details = app('App\Http\Controllers\API\UserController')->getFacility($res['facility_id']);
+                        $res['facility_details'] = $facility_details;
+                    }
 
-            if(isset($response->data[0]->hospital_id)) {
+                    if(isset($res['hospital_id'])) {
+                        
+                        $hospital_details = app('App\Http\Controllers\API\UserController')->getHospital($res['hospital_id']);
+                        $res['hospital_details'] = $hospital_details;
+                    }
+                    $response->data[$i++] = $res;
+                }
                 
-                $hospital_details = app('App\Http\Controllers\API\UserController')->getHospital($response->data[0]->hospital_id);
-                $response->data['hospital_details'] = $hospital_details;
-            }
-
-            if(isset($response->data[0]->relation_id)) {
-                
-                $relation_details = app('App\Http\Controllers\API\UserController')->getRelation($response->data[0]->relation_id);
-                $response->data['relation_details'] = $relation_details;
             }
 
             return $this->responseWithSuccessAndPagination($response, null, $result->getStatusCode(), 'appointments');
@@ -200,7 +212,28 @@ class AppointmentController extends BaseController
     {
         $result = parent::show(...$args);
         $response = json_decode($result->getContent());
+
         if($result->getStatusCode() == 200) {
+
+            if(isset($response->data->doctor_id)) {
+
+                $doctor_details = app('App\Http\Controllers\API\UserController')->getDoctor($response->data->doctor_id);
+
+                $response->data->doctor_details = $doctor_details;
+            }
+
+            if(isset($response->data->facility_id)) {
+                
+                $facility_details = app('App\Http\Controllers\API\UserController')->getFacility($response->data->facility_id);
+                $response->data->facility_details = $facility_details;
+            }
+
+            if(isset($response->data->hospital_id)) {
+                
+                $hospital_details = app('App\Http\Controllers\API\UserController')->getHospital($response->data->hospital_id);
+                $response->data->hospital_details = $hospital_details;
+            }
+
             $data = [
                 'appointment' => $response->data
             ];

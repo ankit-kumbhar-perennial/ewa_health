@@ -27,7 +27,9 @@ Route::apiResource('hospitals', 'API\HospitalController');
 
 Route::apiResource('facilities', 'API\FacilitiesController');
 
-Route::apiResource('appointments', 'API\AppointmentController');
+Route::group(['middleware' => 'auth:api'], function() {
+	Route::apiResource('appointments', 'API\AppointmentController');
+});
 
 Route::apiResource('history', 'API\AppointmentController');
 
